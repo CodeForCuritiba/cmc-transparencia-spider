@@ -34,7 +34,8 @@ class HoleriteSpider(scrapy.Spider):
             return
 
     def parse_servidores(self, response):
-        for tr in response.css('table#beneficiarios tr'):
+
+        for tr in response.css('table tr'):
             nome = tr.css('td::text').extract_first()
 
             if type(nome) is not str:
@@ -56,6 +57,7 @@ class HoleriteSpider(scrapy.Spider):
             yield request
 
     def parse_salarios(self, response):
+        self.log(servidores)
         id = response.meta['ref_id']
         servidor = servidores.get(id)
         self.log('Consultando servidor: ' + servidor['nome'])
