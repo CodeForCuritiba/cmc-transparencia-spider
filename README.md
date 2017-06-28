@@ -36,4 +36,12 @@ This project was made with `python3` and `scrapy`.
 
 ## Generating the HTML
 
-    node html/generate-table.js data/vereadores.json > html/vereadores.html
+    node javascript/generate-table.js data/vereadores.json > html/vereadores.html;
+    node javascript/generate-table.js data/efetivos.json > html/efetivos.html;
+    node javascript/generate-table.js data/comissionados.json > html/comissionados.html;
+    node javascript/generate-table.js data/inativos.json > html/inativos.html;
+    node javascript/generate-table.js data/ouvidor.json > html/ouvidor.html;
+    node javascript/generate-table.js data/cedido-para-camara.json > html/cedido-para-camara.html;
+    node javascript/generate-table.js data/cedido-pela-camara.json > html/cedido-pela-camara.html;
+    node javascript/generate-table.js data/temporario.json > html/temporario.html;
+    node javascript/generate-table.js data/estagiario.json > html/estagiario.html;

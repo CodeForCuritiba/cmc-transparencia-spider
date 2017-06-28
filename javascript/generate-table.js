@@ -48,8 +48,8 @@ function transform (data) {
     _.each(itens, (item, index) => {
         let dataArray = [];
 
-        _.each(_.keys(itens[0]), (key) => {
-            const value = itens[0][key]
+        _.each(_.keys(item), (key) => {
+            const value = item[key]
 
             if (typeof value === 'object') {
                 getItemChildAttribute('value', value, (attr) => {
