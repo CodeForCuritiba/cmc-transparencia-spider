@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CMC Transparência</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.min.css">
+    <style>
+        body{ overflow: auto;  }
+        .spinner { margin: 100px auto; width: 50px; height: 40px; text-align: center; font-size: 10px; z-index: 10;}
+        .spinner > div { background-color: white; height: 100%; width: 6px; display: inline-block; -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out; animation: sk-stretchdelay 1.2s infinite ease-in-out; }
+        .spinner .rect2 { -webkit-animation-delay: -1.1s; animation-delay: -1.1s; }
+        .spinner .rect3 { -webkit-animation-delay: -1.0s; animation-delay: -1.0s; }
+        .spinner .rect4 { -webkit-animation-delay: -0.9s; animation-delay: -0.9s; }
+        .spinner .rect5 { -webkit-animation-delay: -0.8s; animation-delay: -0.8s; }
+        @-webkit-keyframes sk-stretchdelay {
+          0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+          20% { -webkit-transform: scaleY(1.0) }
+        }
+        @keyframes sk-stretchdelay {
+          0%, 40%, 100% {
+            transform: scaleY(0.4);
+            -webkit-transform: scaleY(0.4);
+          }  20% {
+            transform: scaleY(1.0);
+            -webkit-transform: scaleY(1.0);
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class="modal loading-model">
+        <div class="spinner">
+          <div class="rect1"></div>
+          <div class="rect2"></div>
+          <div class="rect3"></div>
+          <div class="rect4"></div>
+          <div class="rect5"></div>
+        </div>
+        <div class="modal-background"></div>
+
+    </div>
+    <div class="field is-grouped">
+        <p class="control">
+            <button class="button" data-table="vereadores">Vereadores</button>
+        </p>
+        <p class="control">
+            <button class="button" data-table="efetivos">Efetivos</button>
+        </p>
+        <p class="control">
+            <button class="button" data-table="comissionados">Comissionados</button>
+        </p>
+        <p class="control">
+            <button class="button" data-table="inativos">Inativos</button>
+        </p>
+        <p class="control">
+            <button class="button" data-table="ouvidor">Ouvidor</button>
+        </p>
+        <p class="control">
+            <button class="button" data-table="cedido-para-camara">Cedido para a Câmara</button>
+        </p>
+        <p class="control">
+            <button class="button" data-table="cedido-pela-camara">Cedido pela Câmara</button>
+        </p>
+        <p class="control">
+            <button class="button" data-table="temporario">Temporário</button>
+        </p>
+        <p class="control">
+            <button class="button" data-table="estagiario">Estagiário</button>
+        </p>
+    </div>
+
+    <div id="table-placeholder">
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+    $(function(){
+        var url = 'https://raw.githubusercontent.com/CodeForCuritiba/cmc-transparencia/master/html/'
+
+        $('[data-table]').click(function(){
+            var name = $(this).attr('data-table')
+            var htmlUrl = url + name + '.html'
+
+            $('#table-placeholder').html('')
+
+            $('.loading-model').addClass('is-active')
+
+            $.get(htmlUrl, function(data){
+                $('#table-placeholder').append(data)
+                $('table').addClass('table is-bordered is-striped is-narrow')
+            })
+                .always(function(){
+                    $('.loading-model').removeClass('is-active')
+                })
+        })
+    })
+    </script>
+</body>
+</html>
