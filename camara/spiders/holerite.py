@@ -2,12 +2,16 @@ import scrapy
 import os
 
 BASE_URL='https://www.cmc.pr.gov.br/portal-transparencia/'
+
 CPF=os.environ['CMC_CPF']
 SENHA=os.environ['CMC_SENHA']
-vereadores = {}
+GRUPO=os.environ['CMC_GRUPO']
+MESANO=os.environ['CMC_MESANO']
 
-class VereadoresSpider(scrapy.Spider):
-    name = 'vereadores'
+servidores = {}
+
+class HoleriteSpider(scrapy.Spider):
+    name = 'holerite'
     start_urls = [BASE_URL + '/consultante/login.html']
 
     def parse(self, response):
@@ -22,15 +26,14 @@ class VereadoresSpider(scrapy.Spider):
             self.log('Usuário Logado!')
             return [scrapy.FormRequest(
                 url=BASE_URL + '/holerite/index.html',
-                formdata={'acao':'', 'grupo':'1', 'mesano': '05/2017', 'tipo':'1'},
-                callback=self.parse_vereadores
+                formdata={'acao':'', 'grupo':GRUPO, 'mesano': MESANO, 'tipo':'1'},
+                callback=self.parse_servidores
             )]
         else:
             self.log('Algo deu errado no login')
             return
 
-    def parse_vereadores(self, response):
-        # self.log(response.text)
+    def parse_servidores(self, response):
         for tr in response.css('table#beneficiarios tr'):
             nome = tr.css('td::text').extract_first()
 
@@ -38,33 +41,41 @@ class VereadoresSpider(scrapy.Spider):
                 continue
 
             id = tr.css('a::attr(href)').extract_first().replace('javascript:pesquisa(', '').replace(');', '')
-            vereadores[id] = { 'nome': nome }
+            cargo = tr.css('td:nth-child(2)::text').extract_first()
+            lotacao = tr.css('td:nth-child(4)::text').extract_first()
+
+            servidores[id] = { 'nome': nome, 'cargo': cargo, 'lotacao': lotacao }
 
             request = scrapy.FormRequest(
                     url=BASE_URL + '/holerite/consulta_beneficiario.html',
-                    formdata={ 'hol_ben_id':id, 'hol_mesano':'05/2017', 'hol_tipo':'1', 'hol_grupo':'1', 'acao':'' },
+                    formdata={ 'hol_ben_id':id, 'hol_mesano':MESANO, 'hol_tipo':'1', 'hol_grupo':GRUPO, 'acao':'' },
                     callback=self.parse_salarios
                 )
-            request.meta['vereador_id'] = id
+            request.meta['ref_id'] = id
+            # return request
             yield request
 
     def parse_salarios(self, response):
-        id = response.meta['vereador_id']
-        vereador = vereadores.get(id)
-        self.log('Consultando vereador: ' + vereador['nome'])
+        id = response.meta['ref_id']
+        servidor = servidores.get(id)
+        self.log('Consultando servidor: ' + servidor['nome'])
 
         if "Consultado por" not in response.text:
             self.log('-------> ERRO ao consultar salários')
             return
 
-        subsidio = response.css('table#holerite tr:nth-child(2) td:nth-child(1)::text').extract_first()
-        totalBruto = response.css('table#holerite tr:nth-child(2) td:nth-child(6)::text').extract_first()
-        totalDescontos = response.css('table#holerite tr:nth-child(4) td:nth-child(5)::text').extract_first()
-        totalLiquido = response.css('table#holerite tr:nth-child(4) td:nth-child(6) strong::text').extract_first()
+        servidor['values'] = {}
 
-        vereador['subsidio'] =  subsidio
-        vereador['totalBruto'] =  totalBruto
-        vereador['totalDescontos'] = totalDescontos
-        vereador['totalLiquido'] =  totalLiquido
+        i = 0
+        for td in response.css('table tr.holerite_descricao td'):
+            header = td.css('::text').extract_first()
+            servidor['values'][i] = { 'name': header }
+            i += 1
 
-        yield vereador
+        i = 0
+        for td in response.css('table tr.holerite_valor td'):
+            value = td.css('::text').extract_first()
+            servidor['values'][i]['value'] = value
+            i += 1
+
+        yield servidor
