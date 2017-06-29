@@ -93,7 +93,11 @@
             $.get(htmlUrl, function(data){
                 $('#table-placeholder').append(data)
                 $('table').addClass('table is-bordered is-striped is-narrow')
-                $('table').DataTable();
+                $('table').DataTable({
+                    paging: false,
+                    searching: true,
+                    order: [[0, 'asc']]
+                })
             })
                 .always(function(){
                     $('.loading-model').removeClass('is-active')
