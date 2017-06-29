@@ -6,6 +6,7 @@
 
     <meta name="viewport" content="width=device-width, user-scalable=yes">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.min.css">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
     <style>
         body{ overflow: auto;  }
         .spinner { margin: 100px auto; width: 50px; height: 40px; text-align: center; font-size: 10px; z-index: 10;}
@@ -76,6 +77,7 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script>
     $(function(){
         var url = 'https://raw.githubusercontent.com/CodeForCuritiba/cmc-transparencia/master/html/'
@@ -90,7 +92,8 @@
 
             $.get(htmlUrl, function(data){
                 $('#table-placeholder').append(data)
-                $('table').addClass('table is-bordered is-striped is-narrow')
+                // $('table').addClass('table is-bordered is-striped is-narrow')
+                $('table').DataTable();
             })
                 .always(function(){
                     $('.loading-model').removeClass('is-active')
