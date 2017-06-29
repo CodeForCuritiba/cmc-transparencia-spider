@@ -98,7 +98,10 @@
                 $('table').DataTable({
                     paging: false,
                     searching: true,
-                    order: [[0, 'asc']]
+                    order: [[0, 'asc']],
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Portuguese-Brasil.json'
+                    }
                 })
             })
                 .always(function(){
