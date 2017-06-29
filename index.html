@@ -92,7 +92,7 @@
 
             $.get(htmlUrl, function(data){
                 $('#table-placeholder').append(data)
-                // $('table').addClass('table is-bordered is-striped is-narrow')
+                $('table').addClass('table is-bordered is-striped is-narrow')
                 $('table').DataTable();
             })
                 .always(function(){
