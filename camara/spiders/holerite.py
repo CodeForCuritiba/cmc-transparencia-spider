@@ -13,6 +13,8 @@ NOW = datetime.datetime.now()
 class HoleriteSpider(scrapy.Spider):
     entities = {}
     headers = []
+    total_dates = 0
+
     name = 'holerite'
     start_urls = [BASE_URL + '/consultante/login.html']
 
@@ -35,30 +37,38 @@ class HoleriteSpider(scrapy.Spider):
             self.log('Usuário Logado!')
             return self.parse_dates(response)
         else:
-            return self.log('Algo deu errado no login')
+            self.log('Algo deu errado no login')
+            return self.log(response.text)
 
     def parse_dates(self, response):
         """
         The data is organized by dates, the spider will
         get the entire year relative data
         """
+        dates = []
         for date in response.css('select[name="mesano"] option'):
             mesano = date.css('::attr(value)').extract_first()
             if mesano.find(str(NOW.year)) > -1:
-                response = scrapy.FormRequest(
-                    url=BASE_URL + '/holerite/index.html',
-                    formdata={
-                        'acao':'',
-                        'grupo':GRUPO,
-                        'mesano': mesano,
-                        'tipo':'1'
-                    },
-                    callback=self.parse_entities
-                )
+                dates.append(mesano)
 
-                response.meta['mesano'] = mesano
+        dates.reverse()
+        self.total_dates = len(dates)
 
-                yield response
+        for date in dates:
+            response = scrapy.FormRequest(
+                url=BASE_URL + '/holerite/index.html',
+                formdata={
+                    'acao':'',
+                    'grupo':GRUPO,
+                    'mesano': date,
+                    'tipo':'1'
+                },
+                callback=self.parse_entities
+            )
+
+            response.meta['mesano'] = date
+
+            yield response
 
     def parse_entities(self, response):
         """
@@ -91,12 +101,6 @@ class HoleriteSpider(scrapy.Spider):
 
             id_index = str(headers_length + 1)
 
-            # self.log('------------------------------------------------------')
-            # self.log(self.headers)
-            # self.log('id_index: ' + id_index)
-            # self.log(tr.css('td:nth-child('+id_index+')'))
-            # return self.log('------------------------------------------------------')
-
             entity_id = tr.css('td:nth-child('+id_index+') a::attr(href)') \
                             .extract_first() \
                             .replace('javascript:pesquisa(', '') \
@@ -104,6 +108,7 @@ class HoleriteSpider(scrapy.Spider):
 
             # If the entity wasn't found yet get the profile
             if entity_id not in self.entities.keys():
+                self.logger.info('# Getting entity profile for id %s', entity_id)
                 self.entities[entity_id] = self.__get_entity_profile(tr, entity_id)
 
             # Make a new request to get salaries in the other page
@@ -138,7 +143,6 @@ class HoleriteSpider(scrapy.Spider):
 
         if "Vencimentos pagos pelo órgão de origem." in response.text:
             entity['salaries'][mes_ano] = "Vencimentos pagos pelo órgão de origem."
-            yield entity
         elif "Consultado por" not in response.text:
             self.log('-------> ERRO ao consultar salários')
             entity['salaries'][mes_ano] = response.text
@@ -158,7 +162,8 @@ class HoleriteSpider(scrapy.Spider):
             entity['salaries'][mes_ano][keyName] = value
             i += 1
 
-        yield entity
+        if len(entity['salaries']) is self.total_dates:
+            yield entity
 
     def __get_entity_profile(self, table_row, entity_id):
         values = {}
