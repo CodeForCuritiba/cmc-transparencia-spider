@@ -8,7 +8,9 @@
 import scrapy
 
 
-class CamaraItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class VereadorItem(scrapy.Item):
+    name = scrapy.Field()
+    salary_gross = scrapy.Field()
+    salary_liquid = scrapy.Field()
+    mesano = scrapy.Field()
+    entity_id = scrapy.Field()
