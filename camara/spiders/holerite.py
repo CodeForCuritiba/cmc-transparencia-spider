@@ -1,6 +1,9 @@
 import scrapy
+from camara.items import VereadorItem
+from scrapy.selector import Selector
 import os
-import datetime
+import time
+import re
 
 BASE_URL = 'https://www.cmc.pr.gov.br/portal-transparencia/'
 
@@ -8,13 +11,10 @@ CPF = os.environ['CMC_CPF']
 SENHA = os.environ['CMC_SENHA']
 GRUPO = os.environ['CMC_GRUPO']
 
-NOW = datetime.datetime.now()
 
 class HoleriteSpider(scrapy.Spider):
     entities = {}
     headers = []
-    total_dates = 0
-
     name = 'holerite'
     start_urls = [BASE_URL + '/consultante/login.html']
 
@@ -37,93 +37,64 @@ class HoleriteSpider(scrapy.Spider):
             self.log('Usuário Logado!')
             return self.parse_dates(response)
         else:
-            self.log('Algo deu errado no login')
-            return self.log(response.text)
+            return self.log('Algo deu errado no login')
 
     def parse_dates(self, response):
         """
         The data is organized by dates, the spider will
         get the entire year relative data
         """
-        dates = []
         for date in response.css('select[name="mesano"] option'):
             mesano = date.css('::attr(value)').extract_first()
-            if mesano.find(str(NOW.year)) > -1:
-                dates.append(mesano)
 
-        dates.reverse()
-        self.total_dates = len(dates)
+            if re.search(r"(\d{4})", mesano).group(1) == time.strftime("%Y"):
 
-        for date in dates:
-            response = scrapy.FormRequest(
-                url=BASE_URL + '/holerite/index.html',
-                formdata={
-                    'acao':'',
-                    'grupo':GRUPO,
-                    'mesano': date,
-                    'tipo':'1'
-                },
-                callback=self.parse_entities
-            )
+                request = scrapy.FormRequest(
+                    url=BASE_URL + 'holerite/index.html',
+                    formdata={
+                        'acao': '',
+                        'grupo': GRUPO,
+                        'mesano': mesano,
+                        'tipo': '1'
+                    },
+                    callback=self.parse_entities
+                )
 
-            response.meta['mesano'] = date
+                request.meta['mesano'] = mesano
 
-            yield response
+                yield request
 
     def parse_entities(self, response):
         """
         A table is displayed with the data about the person
         who works at the Câmara
         """
+
         mesano = response.meta['mesano']
-        self.log('Getting mesano: ' + str(mesano))
+
+        self.log('Getting mesano: ' + mesano)
 
         # Check if the table is empty
-        table_empty = not response.css('table tr td:nth-child(1)') \
-                                    .extract_first()
-        if table_empty:
+        if not response.css('table tr td:nth-child(1)').extract_first():
             return self.log('Nenhum dado disponível')
 
-        # If the headers wasn't defined yet mount the set
-        headers_length = len(self.headers)
-        if headers_length is 0:
-            for th in response.css('table tr th'):
-                header = th.css('::text').extract_first()
-                if header:
-                    self.headers.append(header)
-            headers_length = len(self.headers)
+        for tr in response.xpath('//table[@id="beneficiarios"]/tr').extract():
+            selector = Selector(text=tr)
+            entity_id = re.search("(javascript:pesquisa\()(\d*)(\);)", tr).group(2)
 
-        # Get all the values about the entities
-        for tr in response.css('table tr'):
-            # If row is the header row ignore
-            if not tr.css('td'):
-                continue
-
-            id_index = str(headers_length + 1)
-
-            entity_id = tr.css('td:nth-child('+id_index+') a::attr(href)') \
-                            .extract_first() \
-                            .replace('javascript:pesquisa(', '') \
-                            .replace(');', '')
-
-            # If the entity wasn't found yet get the profile
-            if entity_id not in self.entities.keys():
-                self.logger.info('# Getting entity profile for id %s', entity_id)
-                self.entities[entity_id] = self.__get_entity_profile(tr, entity_id)
-
-            # Make a new request to get salaries in the other page
             request = scrapy.FormRequest(
-                url=BASE_URL + '/holerite/consulta_beneficiario.html',
+                url=BASE_URL + 'holerite/consulta_beneficiario.html',
                 formdata={
-                    'hol_ben_id':entity_id,
-                    'hol_mesano':mesano,
-                    'hol_tipo':'1',
-                    'hol_grupo':GRUPO,
+                    'hol_ben_id': entity_id,
+                    'hol_mesano': mesano,
+                    'hol_tipo': '1',
+                    'hol_grupo': GRUPO,
                     'acao':''
                 },
                 callback=self.parse_salaries
             )
 
+            request.meta['name'] = selector.xpath("//tr/td/text()").extract_first()
             request.meta['entity_id'] = entity_id
             request.meta['mesano'] = mesano
 
@@ -137,47 +108,14 @@ class HoleriteSpider(scrapy.Spider):
         The id was passed in the response.meta
         """
 
-        entity_id = response.meta['entity_id']
-        mes_ano = response.meta['mesano']
-        entity = self.entities.get(entity_id)
+        item = VereadorItem()
+        item['name'] = response.meta['name']
+        item['entity_id'] = response.meta['entity_id']
+        item['mesano'] = response.meta['mesano']
 
-        if "Vencimentos pagos pelo órgão de origem." in response.text:
-            entity['salaries'][mes_ano] = "Vencimentos pagos pelo órgão de origem."
-        elif "Consultado por" not in response.text:
-            self.log('-------> ERRO ao consultar salários')
-            entity['salaries'][mes_ano] = response.text
-
-        # Init the month salary at the entity
-        if mes_ano not in entity.keys():
-            entity['salaries'][mes_ano] = {}
-
-        for td in response.css('table tr.holerite_descricao td'):
-            header = td.css('::text').extract_first()
-            entity['salaries'][mes_ano][header] = ''
-
-        i = 0
-        for td in response.css('table tr.holerite_valor td'):
-            value = td.css('::text').extract_first()
-            keyName = list(entity['salaries'][mes_ano].keys())[i]
-            entity['salaries'][mes_ano][keyName] = value
-            i += 1
-
-        if len(entity['salaries']) is self.total_dates:
-            yield entity
-
-    def __get_entity_profile(self, table_row, entity_id):
-        values = {}
-        i = 0
-        for td in table_row.css('td'):
-            try:
-                values[self.headers[i]] = td.css('::text') \
-                                            .extract_first()
-            except IndexError:
-                pass
-            finally:
-                i += 1
-
-        values['id'] = entity_id
-        values['salaries'] = {}
-
-        return values
+        for salary in response.xpath('//*[@id="holerite"]').extract():
+            selector = Selector(text=salary)
+            table = selector.xpath('//tr[@class="holerite_valor"]/td/text()').extract()
+            item["salary_gross"] = table[0]
+            item["salary_liquid"] = selector.xpath('//tr[@class="holerite_valor"]/td/strong/text()').extract_first()
+            return item
