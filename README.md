@@ -1,3 +1,7 @@
+<center>
+![Transparência Câmara](https://github.com/CodeForCuritiba/cmc-transparencia/raw/master/assets/og-image.png)
+</center>
+
 # CMC Transparência
 
 Project to transform the data of "Portal da Transparência" of Câmara Munipal de Curitiba into a user-friendly and anonymously data.
@@ -24,15 +28,15 @@ This project was made with `python3` and `scrapy`.
 
 ## Running the project
 
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=1 CMC_MESANO='05/2017' scrapy crawl holerite -o data/vereadores.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=2 CMC_MESANO='05/2017' scrapy crawl holerite -o data/efetivos.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=3 CMC_MESANO='05/2017' scrapy crawl holerite -o data/comissionados.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=4 CMC_MESANO='05/2017' scrapy crawl holerite -o data/inativos.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=5 CMC_MESANO='05/2017' scrapy crawl holerite -o data/ouvidor.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=6 CMC_MESANO='05/2017' scrapy crawl holerite -o data/cedido-para-camara.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=7 CMC_MESANO='05/2017' scrapy crawl holerite -o data/cedido-pela-camara.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=8 CMC_MESANO='05/2017' scrapy crawl holerite -o data/temporario.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=9 CMC_MESANO='05/2017' scrapy crawl holerite -o data/estagiario.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=1 scrapy crawl holerite -o data/vereadores.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=2 scrapy crawl holerite -o data/efetivos.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=3 scrapy crawl holerite -o data/comissionados.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=4 scrapy crawl holerite -o data/inativos.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=5 scrapy crawl holerite -o data/ouvidor.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=6 scrapy crawl holerite -o data/cedido-para-camara.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=7 scrapy crawl holerite -o data/cedido-pela-camara.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=8 scrapy crawl holerite -o data/temporario.json
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=9 scrapy crawl holerite -o data/estagiario.json
 
 ## Generating the HTML
 
