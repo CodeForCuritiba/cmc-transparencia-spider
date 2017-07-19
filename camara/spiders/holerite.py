@@ -11,7 +11,6 @@ CPF = os.environ['CMC_CPF']
 SENHA = os.environ['CMC_SENHA']
 GRUPO = os.environ['CMC_GRUPO']
 
-
 class HoleriteSpider(scrapy.Spider):
     entities = {}
     headers = []
