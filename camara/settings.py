@@ -67,7 +67,8 @@ DUPEFILTER = True
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'camara.pipelines.CamaraPipeline': 300,
+    'camara.pipelines.MongoPipeline': 100,
+    # 'camara.pipelines.CamaraPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -91,5 +92,23 @@ ITEM_PIPELINES = {
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
+LOG_LEVEL='INFO'
 # LOG_STDOUT = True
 # LOG_FILE = './output.log'
+
+import os
+
+MONGO_URI = os.environ['MONGO_URI']
+MONGO_DATABASE = os.environ['MONGO_DATABASE']
+
+ENTITIES_TYPES = {
+    '1': 'vereadores',
+    '2': 'efetivos',
+    '3': 'comissionados',
+    '4': 'inativos',
+    '5': 'ouvidor',
+    '6': 'cedido_para_camara',
+    '7': 'cedido_pela_camara',
+    '8': 'temporario',
+    '9': 'estagiario'
+}

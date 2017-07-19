@@ -78,7 +78,7 @@ class HoleriteSpider(scrapy.Spider):
         if not response.css('table tr td:nth-child(1)').extract_first():
             return self.log('Nenhum dado disponível')
 
-        for tr in response.xpath('//table[@id="beneficiarios"]/tr').extract():
+        for tr in response.xpath('//table/tr').extract():
             selector = Selector(text=tr)
             entity_id = re.search("(javascript:pesquisa\()(\d*)(\);)", tr).group(2)
 
@@ -110,7 +110,7 @@ class HoleriteSpider(scrapy.Spider):
 
         item = VereadorItem()
         item['name'] = response.meta['name']
-        item['entity_id'] = response.meta['entity_id']
+        item['id'] = response.meta['entity_id']
         item['mesano'] = response.meta['mesano']
 
         for salary in response.xpath('//*[@id="holerite"]').extract():

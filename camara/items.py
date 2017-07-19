@@ -9,8 +9,8 @@ import scrapy
 
 
 class VereadorItem(scrapy.Item):
+    id = scrapy.Field()
     name = scrapy.Field()
     salary_gross = scrapy.Field()
     salary_liquid = scrapy.Field()
     mesano = scrapy.Field()
-    entity_id = scrapy.Field()
