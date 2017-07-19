@@ -106,9 +106,9 @@ ENTITIES_TYPES = {
     '2': 'efetivos',
     '3': 'comissionados',
     '4': 'inativos',
-    '5': 'ouvidor',
-    '6': 'cedido_para_camara',
-    '7': 'cedido_pela_camara',
-    '8': 'temporario',
-    '9': 'estagiario'
+    '5': 'ouvidors',
+    '6': 'cedidos_para_camara',
+    '7': 'cedidos_pela_camara',
+    '8': 'temporarios',
+    '9': 'estagiarios'
 }
