@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
-    "start": "node build/dev-server.js && node server",
+    "old-start": "node build/dev-server.js",
+    "start": "node server",
     "build": "node build/build.js",
     "lint": "eslint --ext .js,.vue src",
     "serve": "nodemon server"
