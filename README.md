@@ -1,5 +1,5 @@
 <center>
-![Transparência Câmara](https://github.com/CodeForCuritiba/cmc-transparencia/raw/master/assets/og-image.png)
+<img src="https://github.com/CodeForCuritiba/cmc-transparencia/raw/master/assets/og-image.png" >
 </center>
 
 # CMC Transparência
