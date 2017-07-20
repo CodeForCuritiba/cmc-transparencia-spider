@@ -28,24 +28,19 @@ This project was made with `python3` and `scrapy`.
 
 ## Running the project
 
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=1 scrapy crawl holerite -o data/vereadores.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=2 scrapy crawl holerite -o data/efetivos.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=3 scrapy crawl holerite -o data/comissionados.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=4 scrapy crawl holerite -o data/inativos.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=5 scrapy crawl holerite -o data/ouvidor.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=6 scrapy crawl holerite -o data/cedido-para-camara.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=7 scrapy crawl holerite -o data/cedido-pela-camara.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=8 scrapy crawl holerite -o data/temporario.json
-    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=9 scrapy crawl holerite -o data/estagiario.json
+The results will be imported to MongoDB so you need to setup the MongoDB uri:
 
-## Generating the HTML
+    export MONGO_URI='mongodb://<user>:<pass>@<server>/<database>'
+    export MONGO_DATABASE='<database>'
 
-    node javascript/generate-table.js data/vereadores.json > html/vereadores.html;
-    node javascript/generate-table.js data/efetivos.json > html/efetivos.html;
-    node javascript/generate-table.js data/comissionados.json > html/comissionados.html;
-    node javascript/generate-table.js data/inativos.json > html/inativos.html;
-    node javascript/generate-table.js data/ouvidor.json > html/ouvidor.html;
-    node javascript/generate-table.js data/cedido-para-camara.json > html/cedido-para-camara.html;
-    node javascript/generate-table.js data/cedido-pela-camara.json > html/cedido-pela-camara.html;
-    node javascript/generate-table.js data/temporario.json > html/temporario.html;
-    node javascript/generate-table.js data/estagiario.json > html/estagiario.html;
+So you'll able to run the spider:
+
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=1 scrapy crawl holerite
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=2 scrapy crawl holerite
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=3 scrapy crawl holerite
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=4 scrapy crawl holerite
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=5 scrapy crawl holerite
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=6 scrapy crawl holerite
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=7 scrapy crawl holerite
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=8 scrapy crawl holerite
+    CMC_CPF={CPF} CMC_SENHA={SENHA} CMC_GRUPO=9 scrapy crawl holerite
